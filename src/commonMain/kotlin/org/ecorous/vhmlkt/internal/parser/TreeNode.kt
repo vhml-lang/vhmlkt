@@ -14,10 +14,10 @@
     limitations under the License.
  */
 
-package net.peanuuutz.tomlkt.internal.parser
+package org.ecorous.vhmlkt.internal.parser
 
-import net.peanuuutz.tomlkt.TomlElement
-import net.peanuuutz.tomlkt.internal.ConflictEntryException
+import org.ecorous.vhmlkt.VhmlElement
+import org.ecorous.vhmlkt.internal.ConflictEntryException
 
 internal typealias Path = List<String>
 
@@ -49,7 +49,7 @@ internal class ArrayNode(key: String) : TreeNode(key) {
     operator fun get(index: Int): KeyNode = _array[index]
 }
 
-internal class ValueNode(key: String, val value: TomlElement) : TreeNode(key)
+internal class ValueNode(key: String, val value: VhmlElement) : TreeNode(key)
 
 // Extensions
 

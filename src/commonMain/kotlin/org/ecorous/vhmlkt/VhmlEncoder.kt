@@ -14,13 +14,13 @@
     limitations under the License.
  */
 
-package net.peanuuutz.tomlkt
+package org.ecorous.vhmlkt
 
 import kotlinx.serialization.encoding.Encoder
 
-public interface TomlEncoder : Encoder {
-    public fun encodeTomlElement(value: TomlElement)
+public interface VhmlEncoder : Encoder {
+    public fun encodeVhmlElement(value: VhmlElement)
 }
 
-public fun Encoder.asTomlEncoder(): TomlEncoder = this as? TomlEncoder
-    ?: error("Expect TomlEncoder, but found ${this::class.simpleName}")
+public fun Encoder.asVhmlEncoder(): VhmlEncoder = this as? VhmlEncoder
+    ?: error("Expect VhmlEncoder, but found ${this::class.simpleName}")

@@ -87,7 +87,7 @@ tasks {
             "commonMain" {
                 sourceLink {
                     localDirectory.set(file("src/commonMain/kotlin"))
-                    remoteUrl.set(URL("https://github.com/Peanuuutz/tomlkt/blob/master/src/commonMain/kotlin"))
+                    remoteUrl.set(URL("https://github.com/vhml-lang/vhmlkt/blob/master/src/commonMain/kotlin"))
                     remoteLineSuffix.set("#L")
                 }
             }
@@ -130,9 +130,9 @@ publishing {
         withType<MavenPublication> {
             artifact(tasks["createJavadocByDokka"])
             pom {
-                name.set("tomlkt")
-                description.set("TOML support for kotlinx.serialization")
-                url.set("https://github.com/Peanuuutz/tomlkt")
+                name.set("vhmlkt")
+                description.set("VHML support for kotlinx.serialization")
+                url.set("https://github.com/vhml-lang/vhmlkt")
                 licenses {
                     license {
                         name.set("Apache-2.0")
@@ -141,15 +141,18 @@ publishing {
                 }
                 issueManagement {
                     system.set("Github")
-                    url.set("https://github.com/Peanuuutz/tomlkt/issues")
+                    url.set("https://github.com/vhml-lang/vhmlkt/issues")
                 }
                 scm {
-                    connection.set("https://github.com/Peanuuutz/tomlkt.git")
-                    url.set("https://github.com/Peanuuutz/tomlkt")
+                    connection.set("https://github.com/vhml-lang/vhmlkt.git")
+                    url.set("https://github.com/vhml-lang/vhmlkt")
                 }
                 developers {
                     developer {
-                        name.set("Peanuuutz")
+                        name.set("Ecorous")
+                    }
+                    developer {
+                        name.set("MaeMachineBroke")
                     }
                 }
             }

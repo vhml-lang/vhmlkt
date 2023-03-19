@@ -14,18 +14,18 @@
     limitations under the License.
  */
 
-package net.peanuuutz.tomlkt
+package org.ecorous.vhmlkt
 
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
-import net.peanuuutz.tomlkt.internal.UnknownKeyException
+import org.ecorous.vhmlkt.internal.UnknownKeyException
 
 /**
- * Builder provided for `Toml { ... }` factory function.
+ * Builder provided for `Vhml { ... }` factory function.
  */
-public class TomlConfigBuilder internal constructor(from: TomlConfig) {
+public class VhmlConfigBuilder internal constructor(from: VhmlConfig) {
     /**
-     * SerializersModule with contextual serializers to be used in the Toml instance.
+     * SerializersModule with contextual serializers to be used in the Vhml instance.
      *
      * [EmptySerializersModule] by default.
      */
@@ -54,7 +54,7 @@ public class TomlConfigBuilder internal constructor(from: TomlConfig) {
 
     // Internal
 
-    internal fun build(): TomlConfig = TomlConfig(
+    internal fun build(): VhmlConfig = VhmlConfig(
         serializersModule,
         itemsPerLineInBlockArray,
         ignoreUnknownKeys
@@ -63,7 +63,7 @@ public class TomlConfigBuilder internal constructor(from: TomlConfig) {
 
 // Internal
 
-internal data class TomlConfig(
+internal data class VhmlConfig(
     val serializersModule: SerializersModule = EmptySerializersModule,
     val itemsPerLineInBlockArray: Int = 1,
     val ignoreUnknownKeys: Boolean = false

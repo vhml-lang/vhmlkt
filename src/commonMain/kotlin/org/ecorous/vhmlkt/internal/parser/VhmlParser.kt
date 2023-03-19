@@ -14,13 +14,10 @@
     limitations under the License.
  */
 
-package net.peanuuutz.tomlkt
+package org.ecorous.vhmlkt.internal.parser
 
-import kotlinx.serialization.encoding.Decoder
+import org.ecorous.vhmlkt.VhmlElement
 
-public interface TomlDecoder : Decoder {
-    public fun decodeTomlElement(): TomlElement
+internal interface VhmlParser<T : VhmlElement> {
+    fun parse(): T
 }
-
-public fun Decoder.asTomlDecoder(): TomlDecoder = this as? TomlDecoder
-    ?: error("Expect TomlDecoder, but found ${this::class.simpleName}")

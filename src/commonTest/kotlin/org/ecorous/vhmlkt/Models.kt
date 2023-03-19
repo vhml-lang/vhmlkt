@@ -1,4 +1,4 @@
-package net.peanuuutz.tomlkt
+package org.ecorous.vhmlkt
 
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
@@ -12,9 +12,9 @@ import kotlinx.serialization.encoding.Encoder
 
 @Serializable
 data class User(
-    @TomlComment("Name of this user")
+    @VhmlComment("Name of this user")
     val name: String,
-    @TomlInline
+    @VhmlInline
     val account: Account? = null
 )
 
@@ -29,22 +29,22 @@ val cooperator = User("Anonymous")
 
 @Serializable
 data class Project(
-    @TomlComment("Project name")
+    @VhmlComment("Project name")
     val name: String,
-    @TomlComment("""
+    @VhmlComment("""
         Current maintainability
         Could be HIGH or LOW
     """)
     val maintainability: Maintainability,
-    @TomlMultilineString @TomlLiteralString
+    @org.ecorous.vhmlkt.VhmlMultilineString @org.ecorous.vhmlkt.VhmlLiteralString
     val description: String? = null,
     val owner: User,
-    @TomlComment("Thank you! :)")
+    @VhmlComment("Thank you! :)")
     val contributors: Set<User> = setOf(owner)
 )
 
-val tomlProject = Project(
-    name = "tomlkt",
+val vhmlProject = Project(
+    name = "vhmlkt",
     maintainability = Maintainability.HIGH,
     description = """
         This is my first project, so sorry for any inconvenience! \
@@ -60,7 +60,7 @@ val yamlProject = Project(
     owner = User("Him188")
 )
 
-val projects = mapOf("Toml" to tomlProject, "Yaml" to yamlProject)
+val projects = mapOf("Vhml" to vhmlProject, "Yaml" to yamlProject)
 
 @Serializable
 enum class Maintainability { HIGH, LOW }
@@ -83,14 +83,14 @@ class EmptyClass
 data class Box<T>(val content: T? = null)
 
 @Serializable
-data class ByteCode(@TomlInteger(TomlInteger.Base.BIN) val code: Byte)
+data class ByteCode(@VhmlInteger(VhmlInteger.Base.BIN) val code: Byte)
 
 @Serializable
-data class Color(@TomlInteger(TomlInteger.Base.HEX) val value: Long)
+data class Color(@VhmlInteger(VhmlInteger.Base.HEX) val value: Long)
 
 @Serializable
 data class NullablePairList<F, S>(
-    @TomlBlockArray(2)
+    @VhmlBlockArray(2)
     val list: List<Pair<F, S>?>
 )
 

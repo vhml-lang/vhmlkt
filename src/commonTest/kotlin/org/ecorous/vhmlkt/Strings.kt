@@ -1,4 +1,4 @@
-package net.peanuuutz.tomlkt
+package org.ecorous.vhmlkt
 
 internal const val cargo: String = """
     [package]
@@ -164,7 +164,7 @@ internal const val cargo: String = """
 """
 
 internal const val project: String = """
-    name = "tomlkt"
+    name = "vhmlkt"
     maintainability = "HIGH"
     description = '''
     This is my first project, so sorry for any inconvenience! \

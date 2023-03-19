@@ -1,9 +1,10 @@
-# Tomlkt
+# vhmlkt
 
-[![Maven Central](https://img.shields.io/maven-central/v/net.peanuuutz/tomlkt)](https://search.maven.org/artifact/net.peanuuutz/tomlkt)
-[![License](https://img.shields.io/github/license/Peanuuutz/tomlkt)](http://www.apache.org/licenses/LICENSE-2.0)
+<!--[![Maven Central](https://img.shields.io/maven-central/v/net.peanuuutz/tomlkt)](https://search.maven.org/artifact/net.peanuuutz/tomlkt)-->
+[![License](https://img.shields.io/github/license/vhml-lang/vhmlkt)](http://www.apache.org/licenses/LICENSE-2.0)
 
-Lightweight and easy to use [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) plugin for [TOML](https://toml.io/) serialization and deserialization.
+Lightweight and easy to use [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) plugin for [VHML](https://vhml.ecorous.org) serialization and deserialization.
+This is a fork of [Peanuuutz/tomlkt](https://github.com/Peanuuutz/tomlkt). The only difference is that this fork is for VHML instead of TOML.
 
 ## Setup
 
@@ -53,12 +54,12 @@ dependencies {
 
 Write some config:
 
-```toml
+```vhml
 name = "Peanuuutz"
 
 [account]
-username = "Peanuuutz"
-password = "123456"
+(string)username = "Peanuuutz"
+(string)password = "123456"
 ```
 
 Write some code:
@@ -78,14 +79,14 @@ data class Account(
 
 fun main() {
     // Here we use JVM
-    val tomlString = Paths.get("...").readText()
+    val vhmlString = Paths.get("...").readText()
     // Either is OK, but to explicitly pass a serializer is faster
-    val user = Toml.decodeFromString(User.serializer(), tomlString)
-    val user = Toml.decodeFromString<User>(tomlString)
+    val user = Vhml.decodeFromString(User.serializer(), tomlString)
+    val user = Vhml.decodeFromString<User>(tomlString)
     // That's it!
 
     // By the way if you need some configuration
-    val toml = Toml {
+    val vhml = Vhml {
         ignoreUnknownKeys = true
     }
     // Use toml instead of Toml.Default to apply the change
@@ -93,7 +94,7 @@ fun main() {
     // Serialization
     val anotherUser = User("Anonymous", null)
     // Again, better to explicitly pass a serializer
-    val config = Toml.encodeToString(User.serializer(), anotherUser)
+    val config = Vhml.encodeToString(User.serializer(), anotherUser)
     Paths.get("...").writeText(config)
     // Done
 }
@@ -101,27 +102,27 @@ fun main() {
 
 ## Features
 
-|TOML format|Serialization|Deserialization|
-|---|---|---|
-|[Comment](#Comment)|:heavy_check_mark:|:heavy_check_mark:|
-|Key|:heavy_check_mark:|:heavy_check_mark:|
-|[String](#String)|:heavy_check_mark:|:heavy_check_mark:|
-|Integer|:heavy_check_mark:|:heavy_check_mark:|
-|Float|:heavy_check_mark:|:heavy_check_mark:|
-|Boolean|:heavy_check_mark:|:heavy_check_mark:|
-|[Date Time](#Date-Time)|:x:|:x:|
-|Array|:heavy_check_mark:|:heavy_check_mark:|
-|[Table](#Table)|:heavy_check_mark::grey_question:|:heavy_check_mark::grey_question:|
-|Inline Table|:heavy_check_mark:|:heavy_check_mark:|
-|Array of Tables|:heavy_check_mark:|:heavy_check_mark:|
+| VHML format             | Serialization                       | Deserialization                   |
+|-------------------------|-------------------------------------|-----------------------------------|
+| [Comment](#Comment)     | :heavy_check_mark:                  | :heavy_check_mark:                |
+| Key                     | :heavy_check_mark:                  | :heavy_check_mark:                |
+| [String](#String)       | :heavy_check_mark:                  | :heavy_check_mark:                |
+| Integer                 | :heavy_check_mark:                  | :heavy_check_mark:                |
+| Float                   | :heavy_check_mark:                  | :heavy_check_mark:                |
+| Boolean                 | :heavy_check_mark:                  | :heavy_check_mark:                |
+| [Date Time](#Date-Time) | :x:                                 | :x:                               |
+| Array                   | :heavy_check_mark:                  | :heavy_check_mark:                |
+| [Table](#Table)         | :heavy_check_mark::grey_question:   | :heavy_check_mark::grey_question: |
+| Inline Table            | :heavy_check_mark:                  | :heavy_check_mark:                |
+| Array of Tables         | :heavy_check_mark:                  | :heavy_check_mark:                |
 
 ### Comment
 
-Implemented as an annotation `@TomlComment` on **properties**:
+Implemented as an annotation `@VhmlComment` on **properties**:
 
 ```kotlin
 class IntData(
-    @TomlComment("""
+    @VhmlComment("""
         An integer,
         but is decoded into Long originally
     """)
@@ -132,10 +133,10 @@ IntData(10086)
 
 The code above will be encoded into:
 
-```toml
+```vhml
 # An integer,
 # but is decoded into Long originally
-int = 10086
+(number)int = 10086
 ```
 
 ### String
@@ -144,7 +145,7 @@ Basic strings are encoded as `"<content>"`. For multilines and literals, put an 
 
 ```kotlin
 class MultilineStringData(
-    @TomlMultilineString
+    @VhmlMultilineString
     val multilineString: String
 )
 MultilineStringData("""
@@ -153,7 +154,7 @@ MultilineStringData("""
 """.trimIndent())
 
 class LiteralStringData(
-    @TomlLiteralString
+    @VhmlLiteralString
     val literalString: String
 )
 LiteralStringData("C:\\Users\\<User>\\.m2\\repositories")
@@ -161,7 +162,8 @@ LiteralStringData("C:\\Users\\<User>\\.m2\\repositories")
 
 The code above will be encoded into:
 
-```toml
+```vhml
+
 multilineString = """
 Do, a deer, a female deer.
 Re, a drop of golden sun."""
@@ -173,10 +175,11 @@ You can use both annotations to get multiline literal string.
 
 ### Date Time
 
-_**Because Kotlin Multiplatform doesn't support this without [additional library](https://github.com/Kotlin/kotlinx-datetime), currently tomlkt doesn't support as well.**_
+_**Because Kotlin Multiplatform doesn't support this without [additional library](https://github.com/Kotlin/kotlinx-datetime), currently vhmlkt doesn't support as well.**_
 
 <font color = 'gray'>*Maybe some day we'll support it for JVM.*</font>:thinking:
 
+<!-- TODO: review table format
 ### Table
 
 :grey_question:: **Currently `PolymorphicKind`s are NOT supported.**
@@ -211,3 +214,4 @@ As you see, if you already have a TOML file, you can have no model class, but st
 *Note: Due to no context of values in TomlTable(see TomlElement.kt), all of those are encoded as inline(meaning you can't get the same serialized structure between model class and TomlTable).*
 
 For other information, view [API docs](https://peanuuutz.github.io/tomlkt/).
+-->

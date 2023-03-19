@@ -14,26 +14,26 @@
     limitations under the License.
  */
 
-package net.peanuuutz.tomlkt.internal.parser
+package org.ecorous.vhmlkt.internal.parser
 
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
-import net.peanuuutz.tomlkt.TomlElement
-import net.peanuuutz.tomlkt.TomlNull
-import net.peanuuutz.tomlkt.TomlLiteral
-import net.peanuuutz.tomlkt.TomlArray
-import net.peanuuutz.tomlkt.TomlTable
-import net.peanuuutz.tomlkt.internal.IncompleteException
-import net.peanuuutz.tomlkt.internal.UnexpectedTokenException
-import net.peanuuutz.tomlkt.internal.S
-import net.peanuuutz.tomlkt.internal.BARE_KEY_REGEX
-import net.peanuuutz.tomlkt.internal.contains
-import net.peanuuutz.tomlkt.internal.RADIX
-import net.peanuuutz.tomlkt.internal.DEC_RANGE
-import net.peanuuutz.tomlkt.internal.toNumber
-import net.peanuuutz.tomlkt.internal.unescape
+import org.ecorous.vhmlkt.VhmlElement
+import org.ecorous.vhmlkt.VhmlNull
+import org.ecorous.vhmlkt.VhmlLiteral
+import org.ecorous.vhmlkt.VhmlArray
+import org.ecorous.vhmlkt.VhmlTable
+import org.ecorous.vhmlkt.internal.IncompleteException
+import org.ecorous.vhmlkt.internal.UnexpectedTokenException
+import org.ecorous.vhmlkt.internal.S
+import org.ecorous.vhmlkt.internal.BARE_KEY_REGEX
+import org.ecorous.vhmlkt.internal.contains
+import org.ecorous.vhmlkt.internal.RADIX
+import org.ecorous.vhmlkt.internal.DEC_RANGE
+import org.ecorous.vhmlkt.internal.toNumber
+import org.ecorous.vhmlkt.internal.unescape
 
-internal class TomlFileParser(source: String) : TomlParser<TomlTable> {
+internal class VhmlFileParser(source: String) : VhmlParser<VhmlTable> {
     private val source: String = source.replace("\r\n", "\n")
 
     private var line: Int = 1
@@ -77,7 +77,7 @@ internal class TomlFileParser(source: String) : TomlParser<TomlTable> {
 
     // endregion
 
-    override fun parse(): TomlTable {
+    override fun parse(): VhmlTable {
         val tree = KeyNode("")
         val arrayOfTableIndices = mutableMapOf<Path, Int>()
         var tablePath: Path? = null
@@ -112,7 +112,7 @@ internal class TomlFileParser(source: String) : TomlParser<TomlTable> {
                 else -> unexpectedToken(c)
             }
         }
-        return TomlTable(tree)
+        return VhmlTable(tree)
     }
 
     // Start right on the last '[', end on the last ']'
@@ -205,8 +205,8 @@ internal class TomlFileParser(source: String) : TomlParser<TomlTable> {
     private fun parseLiteralStringKey(): String = parseLiteralStringValue().content
 
     // Start right before the actual token, end right before '\n' or ',' or ']' or '}'
-    private fun parseValue(inStructure: Boolean): TomlElement {
-        var element: TomlElement? = null
+    private fun parseValue(inStructure: Boolean): VhmlElement {
+        var element: VhmlElement? = null
         while (++currentPosition < source.length) {
             when (val c = getChar()) {
                 ' ', '\t' -> continue
@@ -256,36 +256,36 @@ internal class TomlFileParser(source: String) : TomlParser<TomlTable> {
     }
 
     // Start right on 't' or 'f', ends on the last token
-    private fun parseBooleanValue(): TomlLiteral = when (getChar()) {
+    private fun parseBooleanValue(): VhmlLiteral = when (getChar()) {
         't' -> {
             expectNext("rue")
-            TomlLiteral(true)
+            VhmlLiteral(true)
         }
         'f' -> {
             expectNext("alse")
-            TomlLiteral(false)
+            VhmlLiteral(false)
         }
         else -> unexpectedToken(getChar())
     }
 
     // Start right on 'i' or 'n', end on the last token
-    private fun parseNonNumberValue(positive: Boolean): TomlLiteral = when (getChar()) {
+    private fun parseNonNumberValue(positive: Boolean): VhmlLiteral = when (getChar()) {
         'i' -> {
             expectNext("nf")
-            TomlLiteral(if (positive) "inf" else "-inf", false)
+            VhmlLiteral(if (positive) "inf" else "-inf", false)
         }
         'n' -> {
             expectNext("an")
-            TomlLiteral("nan", false)
+            VhmlLiteral("nan", false)
         }
         else -> unexpectedToken(getChar())
     }
 
     // Start right on the actual token, end right before ' ' or '\t' or '\n' or '#' or ',' or ']' or '}'
-    private fun parseNumberValue(positive: Boolean): TomlLiteral {
+    private fun parseNumberValue(positive: Boolean): VhmlLiteral {
         val builder = StringBuilder().append(getChar())
         if (!beforeFinal())
-            return TomlLiteral(builder.toString().toLong())
+            return VhmlLiteral(builder.toString().toLong())
         val radix = if (builder[0] != '0')
             10
         else when (val c = getChar(1)) {
@@ -338,13 +338,13 @@ internal class TomlFileParser(source: String) : TomlParser<TomlTable> {
             }
         }
         currentPosition--
-        return TomlLiteral(builder.toString().toNumber(positive, radix, isDouble, isExponent))
+        return VhmlLiteral(builder.toString().toNumber(positive, radix, isDouble, isExponent))
     }
 
     // Start right on the first '"', end on the last '"'
-    private fun parseStringValue(): TomlLiteral {
+    private fun parseStringValue(): VhmlLiteral {
         incompleteOn(!beforeFinal())
-        val multiline = checkIsMultiline('"') { return TomlLiteral("") }
+        val multiline = checkIsMultiline('"') { return VhmlLiteral("") }
         val builder = StringBuilder()
         var trim = false
         var justEnded = false
@@ -395,13 +395,13 @@ internal class TomlFileParser(source: String) : TomlParser<TomlTable> {
             }
         }
         incompleteOn(!justEnded)
-        return TomlLiteral(builder.toString().unescape())
+        return VhmlLiteral(builder.toString().unescape())
     }
 
     // Start right on '\'', end on the last '\''
-    private fun parseLiteralStringValue(): TomlLiteral {
+    private fun parseLiteralStringValue(): VhmlLiteral {
         incompleteOn(!beforeFinal())
-        val multiline = checkIsMultiline('\'') { return TomlLiteral("") }
+        val multiline = checkIsMultiline('\'') { return VhmlLiteral("") }
         val builder = StringBuilder()
         var justEnded = false
         while (++currentPosition < source.length) {
@@ -429,7 +429,7 @@ internal class TomlFileParser(source: String) : TomlParser<TomlTable> {
             }
         }
         incompleteOn(!justEnded)
-        return TomlLiteral(builder.toString())
+        return VhmlLiteral(builder.toString())
     }
 
     private inline fun checkIsMultiline(quote: Char, whenEmpty: () -> Unit): Boolean {
@@ -449,8 +449,8 @@ internal class TomlFileParser(source: String) : TomlParser<TomlTable> {
     }
 
     // Start right on '[', end on ']'
-    private fun parseArrayValue(): TomlArray {
-        val builder = mutableListOf<TomlElement>()
+    private fun parseArrayValue(): VhmlArray {
+        val builder = mutableListOf<VhmlElement>()
         var expectValue = true
         var justEnded = false
         while (++currentPosition < source.length) {
@@ -474,11 +474,11 @@ internal class TomlFileParser(source: String) : TomlParser<TomlTable> {
             }
         }
         incompleteOn(!justEnded)
-        return TomlArray(builder)
+        return VhmlArray(builder)
     }
 
     // Start right on '{', end on '}'
-    private fun parseInlineTableValue(): TomlTable {
+    private fun parseInlineTableValue(): VhmlTable {
         val builder = KeyNode("")
         var expectEntry = true
         var justStarted = true
@@ -508,13 +508,13 @@ internal class TomlFileParser(source: String) : TomlParser<TomlTable> {
             }
         }
         incompleteOn(!justEnded)
-        return TomlTable(builder)
+        return VhmlTable(builder)
     }
 
     // Start right on 'n', end on the last token
-    private fun parseNullValue(): TomlNull {
+    private fun parseNullValue(): VhmlNull {
         expectNext("ull")
-        return TomlNull
+        return VhmlNull
     }
 
     // Start right on '#', end right before '\n'

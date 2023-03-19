@@ -16,39 +16,39 @@
 
 @file:Suppress("UNUSED")
 
-package net.peanuuutz.tomlkt
+package org.ecorous.vhmlkt
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.elementNames
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
-import net.peanuuutz.tomlkt.internal.*
-import net.peanuuutz.tomlkt.internal.TomlElementSerializer
-import net.peanuuutz.tomlkt.internal.TomlNullSerializer
-import net.peanuuutz.tomlkt.internal.parser.ArrayNode
-import net.peanuuutz.tomlkt.internal.parser.KeyNode
-import net.peanuuutz.tomlkt.internal.parser.ValueNode
+import org.ecorous.vhmlkt.internal.*
+import org.ecorous.vhmlkt.internal.VhmlElementSerializer
+import org.ecorous.vhmlkt.internal.VhmlNullSerializer
+import org.ecorous.vhmlkt.internal.parser.ArrayNode
+import org.ecorous.vhmlkt.internal.parser.KeyNode
+import org.ecorous.vhmlkt.internal.parser.ValueNode
 
-// TomlElement
+// VhmlElement
 
 /**
- * Represents anything in TOML, including and only including [TomlNull], [TomlLiteral], [TomlArray], [TomlTable].
+ * Represents anything in TOML, including and only including [VhmlNull], [VhmlLiteral], [VhmlArray], [VhmlTable].
  *
- * **Warning: Only use [Toml] to serialize/deserialize any sub-class.**
+ * **Warning: Only use [Vhml] to serialize/deserialize any sub-class.**
  */
-@Serializable(with = TomlElementSerializer::class)
-public sealed class TomlElement {
+@Serializable(with = VhmlElementSerializer::class)
+public sealed class VhmlElement {
     /**
-     * The content of this TomlElement. Each sub-class has its own implementation.
+     * The content of this VhmlElement. Each sub-class has its own implementation.
      */
     public abstract val content: Any?
 
     /**
-     * Gives a string representation of this TomlElement. Each sub-class has its own implementation.
+     * Gives a string representation of this VhmlElement. Each sub-class has its own implementation.
      *
      * ```kotlin
-     * val table = TomlTable(mapOf("isEnabled" to true, "port" to 8080))
+     * val table = VhmlTable(mapOf("isEnabled" to true, "port" to 8080))
      * println(table) // { isEnabled = true, port = 8080 }
      * ```
      *
@@ -57,51 +57,51 @@ public sealed class TomlElement {
     public abstract override fun toString(): String
 }
 
-// TomlNull
+// VhmlNull
 
 /**
  * Represents null.
  *
  * Note: Currently encoded value can NOT be modified.
  */
-@Serializable(with = TomlNullSerializer::class)
-public object TomlNull : TomlElement() {
+@Serializable(with = VhmlNullSerializer::class)
+public object VhmlNull : VhmlElement() {
     override val content: Nothing? = null
 
     override fun toString(): String = "null"
 }
 
-// To TomlNull
+// To VhmlNull
 
 /**
- * Convert [this] to TomlNull.
+ * Convert [this] to VhmlNull.
  *
- * @throws IllegalStateException when [this] is not TomlNull
+ * @throws IllegalStateException when [this] is not VhmlNull
  */
-public fun TomlElement.toTomlNull(): TomlNull = this as? TomlNull ?: failConversion("TomlNull")
+public fun VhmlElement.toVhmlNull(): VhmlNull = this as? VhmlNull ?: failConversion("VhmlNull")
 
-// TomlLiteral
+// VhmlLiteral
 
 /**
  * Represents literal value, which can be booleans, numbers, chars, strings.
  */
-@Serializable(with = TomlLiteralSerializer::class)
-public class TomlLiteral internal constructor(
+@Serializable(with = VhmlLiteralSerializer::class)
+public class VhmlLiteral internal constructor(
     /**
      * The converted value. (see creator functions with the same name)
      */
     override val content: String,
     /**
-     * Indicates whether this TomlLiteral is actually a [Char] or [String].
+     * Indicates whether this VhmlLiteral is actually a [Char] or [String].
      */
     private val isString: Boolean
-) : TomlElement() {
+) : VhmlElement() {
     override fun toString(): String = if (isString) content.escape().doubleQuoted else content
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
-        other as TomlLiteral
+        other as VhmlLiteral
         if (isString != other.isString) return false
         if (content != other.content) return false
         return true
@@ -114,61 +114,61 @@ public class TomlLiteral internal constructor(
     }
 }
 
-// To TomlLiteral
+// To VhmlLiteral
 
 /**
- * Convert [this] to TomlLiteral.
+ * Convert [this] to VhmlLiteral.
  *
- * @throws IllegalStateException when [this] is not TomlLiteral.
+ * @throws IllegalStateException when [this] is not VhmlLiteral.
  */
-public fun TomlElement.toTomlLiteral(): TomlLiteral = this as? TomlLiteral ?: failConversion("TomlLiteral")
+public fun VhmlElement.toVhmlLiteral(): VhmlLiteral = this as? VhmlLiteral ?: failConversion("VhmlLiteral")
 
 /**
- * Creates [TomlLiteral] from the given boolean [value].
+ * Creates [VhmlLiteral] from the given boolean [value].
  */
-public fun TomlLiteral(value: Boolean): TomlLiteral = TomlLiteral(value.toString(), false)
+public fun VhmlLiteral(value: Boolean): VhmlLiteral = VhmlLiteral(value.toString(), false)
 
 /**
- * Creates [TomlLiteral] from the given numeric [value].
+ * Creates [VhmlLiteral] from the given numeric [value].
  *
  * @see toStringModified
  */
-public fun TomlLiteral(value: Number): TomlLiteral = TomlLiteral(value.toStringModified(), false)
+public fun VhmlLiteral(value: Number): VhmlLiteral = VhmlLiteral(value.toStringModified(), false)
 
 /**
- * Creates [TomlLiteral] from the given char [value].
+ * Creates [VhmlLiteral] from the given char [value].
  */
-public fun TomlLiteral(value: Char): TomlLiteral = TomlLiteral(value.toString(), true)
+public fun VhmlLiteral(value: Char): VhmlLiteral = VhmlLiteral(value.toString(), true)
 
 /**
- * Creates [TomlLiteral] from the given string [value].
+ * Creates [VhmlLiteral] from the given string [value].
  */
-public fun TomlLiteral(value: String): TomlLiteral = TomlLiteral(value, true)
+public fun VhmlLiteral(value: String): VhmlLiteral = VhmlLiteral(value, true)
 
 /**
- * Creates [TomlLiteral] from the given enum [value]. Delegates to creator function which consumes string.
+ * Creates [VhmlLiteral] from the given enum [value]. Delegates to creator function which consumes string.
  *
  * @param E the enum class which [value] belongs to.
  * @param serializersModule in most case could be ignored, but for contextual it should be present.
  */
-public inline fun <reified E : Enum<E>> TomlLiteral(
+public inline fun <reified E : Enum<E>> VhmlLiteral(
     value: E,
     serializersModule: SerializersModule = EmptySerializersModule
-): TomlLiteral = TomlLiteral(serializersModule.serializer<E>().descriptor.getElementName(value.ordinal))
+): VhmlLiteral = VhmlLiteral(serializersModule.serializer<E>().descriptor.getElementName(value.ordinal))
 
-// From TomlLiteral
+// From VhmlLiteral
 
 /**
  * Returns content as boolean.
  *
  * @throws IllegalStateException if content cannot be converted into boolean.
  */
-public fun TomlLiteral.toBoolean(): Boolean = toBooleanOrNull() ?: error("Cannot convert $this to Boolean")
+public fun VhmlLiteral.toBoolean(): Boolean = toBooleanOrNull() ?: error("Cannot convert $this to Boolean")
 
 /**
  * Returns content as boolean only if content is "true" or "false", otherwise null.
  */
-public fun TomlLiteral.toBooleanOrNull(): Boolean? = when (content) {
+public fun VhmlLiteral.toBooleanOrNull(): Boolean? = when (content) {
     "true" -> true
     "false" -> false
     else -> null
@@ -179,60 +179,60 @@ public fun TomlLiteral.toBooleanOrNull(): Boolean? = when (content) {
  *
  * @throws NumberFormatException if content cannot be converted into byte.
  */
-public fun TomlLiteral.toByte(): Byte = content.toByte()
+public fun VhmlLiteral.toByte(): Byte = content.toByte()
 
 /**
  * Returns content as byte only if content can be byte, otherwise null.
  */
-public fun TomlLiteral.toByteOrNull(): Byte? = content.toByteOrNull()
+public fun VhmlLiteral.toByteOrNull(): Byte? = content.toByteOrNull()
 
 /**
  * Returns content as short.
  *
  * @throws NumberFormatException if content cannot be converted into short.
  */
-public fun TomlLiteral.toShort(): Short = content.toShort()
+public fun VhmlLiteral.toShort(): Short = content.toShort()
 
 /**
  * Returns content as short only if content can be short, otherwise null.
  */
-public fun TomlLiteral.toShortOrNull(): Short? = content.toShortOrNull()
+public fun VhmlLiteral.toShortOrNull(): Short? = content.toShortOrNull()
 
 /**
  * Returns content as int.
  *
  * @throws NumberFormatException if content cannot be converted into int.
  */
-public fun TomlLiteral.toInt(): Int = content.toInt()
+public fun VhmlLiteral.toInt(): Int = content.toInt()
 
 /**
  * Returns content as int only if content can be int, otherwise null.
  */
-public fun TomlLiteral.toIntOrNull(): Int? = content.toIntOrNull()
+public fun VhmlLiteral.toIntOrNull(): Int? = content.toIntOrNull()
 
 /**
  * Returns content as long.
  *
  * @throws NumberFormatException if content cannot be converted into long.
  */
-public fun TomlLiteral.toLong(): Long = content.toLong()
+public fun VhmlLiteral.toLong(): Long = content.toLong()
 
 /**
  * Returns content as long only if content can be long, otherwise null.
  */
-public fun TomlLiteral.toLongOrNull(): Long? = content.toLongOrNull()
+public fun VhmlLiteral.toLongOrNull(): Long? = content.toLongOrNull()
 
 /**
  * Returns content as float.
  *
  * @throws NumberFormatException if content cannot be converted into float.
  */
-public fun TomlLiteral.toFloat(): Float = toFloatOrNull() ?: throw NumberFormatException("Cannot convert $this to Float")
+public fun VhmlLiteral.toFloat(): Float = toFloatOrNull() ?: throw NumberFormatException("Cannot convert $this to Float")
 
 /**
  * Returns content as float only if content can be an exact float or inf/-inf/nan, otherwise null.
  */
-public fun TomlLiteral.toFloatOrNull(): Float? = when (content) {
+public fun VhmlLiteral.toFloatOrNull(): Float? = when (content) {
     "inf" -> Float.POSITIVE_INFINITY
     "-inf" -> Float.NEGATIVE_INFINITY
     "nan" -> Float.NaN
@@ -244,12 +244,12 @@ public fun TomlLiteral.toFloatOrNull(): Float? = when (content) {
  *
  * @throws NumberFormatException if content cannot be converted into double.
  */
-public fun TomlLiteral.toDouble(): Double = toDoubleOrNull() ?: throw NumberFormatException("Cannot convert $this to Double")
+public fun VhmlLiteral.toDouble(): Double = toDoubleOrNull() ?: throw NumberFormatException("Cannot convert $this to Double")
 
 /**
  * Returns content as double only if content can be an exact double or inf/-inf/nan, otherwise null.
  */
-public fun TomlLiteral.toDoubleOrNull(): Double? = when (content) {
+public fun VhmlLiteral.toDoubleOrNull(): Double? = when (content) {
     "inf" -> Double.POSITIVE_INFINITY
     "-inf" -> Double.NEGATIVE_INFINITY
     "nan" -> Double.NaN
@@ -262,12 +262,12 @@ public fun TomlLiteral.toDoubleOrNull(): Double? = when (content) {
  * @throws NoSuchElementException if content is empty.
  * @throws IllegalArgumentException if content cannot be converted into char.
  */
-public fun TomlLiteral.toChar(): Char = content.single()
+public fun VhmlLiteral.toChar(): Char = content.single()
 
 /**
  * Returns content as char only if the length of content is exactly 1, otherwise null.
  */
-public fun TomlLiteral.toCharOrNull(): Char? = content.singleOrNull()
+public fun VhmlLiteral.toCharOrNull(): Char? = content.singleOrNull()
 
 /**
  * Returns content as enum with given enum class context.
@@ -277,7 +277,7 @@ public fun TomlLiteral.toCharOrNull(): Char? = content.singleOrNull()
  *
  * @throws IllegalStateException if content cannot be converted into [E].
  */
-public inline fun <reified E : Enum<E>> TomlLiteral.toEnum(
+public inline fun <reified E : Enum<E>> VhmlLiteral.toEnum(
     serializersModule: SerializersModule = EmptySerializersModule
 ): E = toEnumOrNull<E>(serializersModule) ?: error("Cannot convert $this to ${E::class.simpleName}")
 
@@ -287,24 +287,24 @@ public inline fun <reified E : Enum<E>> TomlLiteral.toEnum(
  * @param E the enum class which [this] converts to.
  * @param serializersModule in most case could be ignored, but for contextual it should be present.
  */
-public inline fun <reified E : Enum<E>> TomlLiteral.toEnumOrNull(
+public inline fun <reified E : Enum<E>> VhmlLiteral.toEnumOrNull(
     serializersModule: SerializersModule = EmptySerializersModule
 ): E? {
     val index = serializersModule.serializer<E>().descriptor.elementNames.indexOf(content)
     return if (index != -1) enumValues<E>()[index] else null
 }
 
-// TomlArray
+// VhmlArray
 
 /**
- * Represents array in TOML, which values are [TomlElement].
+ * Represents array in TOML, which values are [VhmlElement].
  *
  * As it delegates to list [content], everything in [List] could be used.
  */
-@Serializable(with = TomlArraySerializer::class)
-public class TomlArray internal constructor(
-    override val content: List<TomlElement>
-) : TomlElement(), List<TomlElement> by content {
+@Serializable(with = VhmlArraySerializer::class)
+public class VhmlArray internal constructor(
+    override val content: List<VhmlElement>
+) : VhmlElement(), List<VhmlElement> by content {
     override fun toString(): String = content.joinToString(
         prefix = "[ ",
         postfix = " ]"
@@ -315,37 +315,37 @@ public class TomlArray internal constructor(
     override fun hashCode(): Int = content.hashCode()
 }
 
-// To TomlArray
+// To VhmlArray
 
 /**
- * Convert [this] to TomlArray.
+ * Convert [this] to VhmlArray.
  *
- * @throws IllegalStateException when [this] is not TomlArray.
+ * @throws IllegalStateException when [this] is not VhmlArray.
  */
-public fun TomlElement.toTomlArray(): TomlArray = this as? TomlArray ?: failConversion("TomlArray")
+public fun VhmlElement.toVhmlArray(): VhmlArray = this as? VhmlArray ?: failConversion("VhmlArray")
 
 /**
- * Creates [TomlArray] from the given iterable [value].
+ * Creates [VhmlArray] from the given iterable [value].
  */
-public fun TomlArray(value: Iterable<*>): TomlArray = TomlArray(value.map(Any?::toTomlElement))
+public fun VhmlArray(value: Iterable<*>): VhmlArray = VhmlArray(value.map(Any?::toVhmlElement))
 
-// TomlTable
+// VhmlTable
 
 /**
- * Represents table in TOML, which keys are strings and values are [TomlElement].
+ * Represents table in TOML, which keys are strings and values are [VhmlElement].
  *
  * As it delegates to map [content], everything in [Map] could be used.
  */
-@Serializable(with = TomlTableSerializer::class)
-public class TomlTable internal constructor(
-    override val content: Map<String, TomlElement>
-) : TomlElement(), Map<String, TomlElement> by content {
+@Serializable(with = VhmlTableSerializer::class)
+public class VhmlTable internal constructor(
+    override val content: Map<String, VhmlElement>
+) : VhmlElement(), Map<String, VhmlElement> by content {
     /**
-     * More convenient than [Map.get] if this TomlTable is originally a map with **primitive** keys
+     * More convenient than [Map.get] if this VhmlTable is originally a map with **primitive** keys
      *
      * @throws NonPrimitiveKeyException if provide non-primitive key
      */
-    public operator fun get(key: Any?): TomlElement? = get(key.toTomlKey())
+    public operator fun get(key: Any?): VhmlElement? = get(key.toVhmlKey())
 
     override fun toString(): String = content.entries.joinToString(
         prefix = "{ ",
@@ -357,24 +357,24 @@ public class TomlTable internal constructor(
     override fun hashCode(): Int = content.hashCode()
 }
 
-// To TomlTable
+// To VhmlTable
 
 /**
- * Convert [this] to TomlTable.
+ * Convert [this] to VhmlTable.
  *
- * @throws IllegalStateException when [this] is not TomlTable.
+ * @throws IllegalStateException when [this] is not VhmlTable.
  */
-public fun TomlElement.toTomlTable(): TomlTable = this as? TomlTable ?: failConversion("TomlTable")
+public fun VhmlElement.toVhmlTable(): VhmlTable = this as? VhmlTable ?: failConversion("VhmlTable")
 
 /**
- * Creates [TomlTable] from the given map [value].
+ * Creates [VhmlTable] from the given map [value].
  */
-public fun TomlTable(value: Map<*, *>): TomlTable = TomlTable(buildMap(value.size) {
+public fun VhmlTable(value: Map<*, *>): VhmlTable = VhmlTable(buildMap(value.size) {
     for ((k, v) in value)
-        put(k.toTomlKey(), v.toTomlElement())
+        put(k.toVhmlKey(), v.toVhmlElement())
 })
 
-// Extensions for TomlTable
+// Extensions for VhmlTable
 
 /**
  * Get value along with path constructed by [keys].
@@ -383,61 +383,61 @@ public fun TomlTable(value: Map<*, *>): TomlTable = TomlTable(buildMap(value.siz
  *
  * @throws NonPrimitiveKeyException if provide non-primitive key
  */
-public operator fun TomlTable.get(vararg keys: Any?): TomlElement? = getByPathRecursively(keys, 0)
+public operator fun VhmlTable.get(vararg keys: Any?): VhmlElement? = getByPathRecursively(keys, 0)
 
 // Internal
 
-internal fun TomlTable(value: KeyNode): TomlTable = TomlTable(buildMap(value.children.size) {
+internal fun VhmlTable(value: KeyNode): VhmlTable = VhmlTable(buildMap(value.children.size) {
     for (node in value.children)
-        put(node.key, node.toTomlElement())
+        put(node.key, node.toVhmlElement())
 })
 
-private tailrec fun TomlTable.getByPathRecursively(
+private tailrec fun VhmlTable.getByPathRecursively(
     keys: Array<out Any?>,
     index: Int
-): TomlElement? {
+): VhmlElement? {
     val value = get(keys[index])
     return if (index == keys.lastIndex) {
         value
     } else when (value) {
-        is TomlTable -> value.getByPathRecursively(keys, index + 1)
-        TomlNull, is TomlLiteral, is TomlArray, null -> null
+        is VhmlTable -> value.getByPathRecursively(keys, index + 1)
+        VhmlNull, is VhmlLiteral, is VhmlArray, null -> null
     }
 }
 
-internal fun Any?.toTomlKey(): String = when (this) {
+internal fun Any?.toVhmlKey(): String = when (this) {
     is Boolean, is Number, is Char -> toString()
     is String -> this
     else -> throw NonPrimitiveKeyException()
 }
 
-private fun Any?.toTomlElement(): TomlElement = when (this) {
-    null -> TomlNull
-    is TomlElement -> this
-    is Boolean -> TomlLiteral(this)
-    is Byte -> TomlLiteral(this)
-    is Short -> TomlLiteral(this)
-    is Int -> TomlLiteral(this)
-    is Long -> TomlLiteral(this)
-    is Float -> TomlLiteral(this)
-    is Double -> TomlLiteral(this)
-    is Char -> TomlLiteral(this)
-    is String -> TomlLiteral(this)
-    is BooleanArray -> TomlArray(this.asIterable())
-    is ByteArray -> TomlArray(this.asIterable())
-    is ShortArray -> TomlArray(this.asIterable())
-    is IntArray -> TomlArray(this.asIterable())
-    is LongArray -> TomlArray(this.asIterable())
-    is FloatArray -> TomlArray(this.asIterable())
-    is DoubleArray -> TomlArray(this.asIterable())
-    is CharArray -> TomlArray(this.asIterable())
-    is Array<*> -> TomlArray(this.asIterable())
-    is Iterable<*> -> TomlArray(this)
-    is Map<*, *> -> TomlTable(this)
-    is KeyNode -> TomlTable(this)
-    is ArrayNode -> TomlArray(array)
+private fun Any?.toVhmlElement(): VhmlElement = when (this) {
+    null -> VhmlNull
+    is VhmlElement -> this
+    is Boolean -> VhmlLiteral(this)
+    is Byte -> VhmlLiteral(this)
+    is Short -> VhmlLiteral(this)
+    is Int -> VhmlLiteral(this)
+    is Long -> VhmlLiteral(this)
+    is Float -> VhmlLiteral(this)
+    is Double -> VhmlLiteral(this)
+    is Char -> VhmlLiteral(this)
+    is String -> VhmlLiteral(this)
+    is BooleanArray -> VhmlArray(this.asIterable())
+    is ByteArray -> VhmlArray(this.asIterable())
+    is ShortArray -> VhmlArray(this.asIterable())
+    is IntArray -> VhmlArray(this.asIterable())
+    is LongArray -> VhmlArray(this.asIterable())
+    is FloatArray -> VhmlArray(this.asIterable())
+    is DoubleArray -> VhmlArray(this.asIterable())
+    is CharArray -> VhmlArray(this.asIterable())
+    is Array<*> -> VhmlArray(this.asIterable())
+    is Iterable<*> -> VhmlArray(this)
+    is Map<*, *> -> VhmlTable(this)
+    is KeyNode -> VhmlTable(this)
+    is ArrayNode -> VhmlArray(array)
     is ValueNode -> value
     else -> error("Unsupported class: ${this::class.simpleName}")
 }
 
-private fun TomlElement.failConversion(target: String): Nothing = error("Cannot convert ${this::class.simpleName} to $target")
+private fun VhmlElement.failConversion(target: String): Nothing = error("Cannot convert ${this::class.simpleName} to $target")

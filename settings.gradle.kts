@@ -1,4 +1,4 @@
-rootProject.name = "tomlkt"
+rootProject.name = "vhmlkt"
 
 pluginManagement {
     repositories {

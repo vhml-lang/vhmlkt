@@ -14,7 +14,7 @@
     limitations under the License.
  */
 
-package net.peanuuutz.tomlkt
+package org.ecorous.vhmlkt
 
 import kotlinx.serialization.SerialInfo
 
@@ -23,7 +23,7 @@ import kotlinx.serialization.SerialInfo
  *
  * ```kotlin
  * data class IntData(
- *     @TomlComment("""
+ *     @VhmlComment("""
  *         An integer,
  *         but is decoded into Long originally
  *     """)
@@ -44,13 +44,13 @@ import kotlinx.serialization.SerialInfo
  */
 @SerialInfo
 @Target(AnnotationTarget.PROPERTY)
-public annotation class TomlComment(val text: String)
+public annotation class VhmlComment(val text: String)
 
 @Deprecated(
     message = "Support for multiline strings",
     replaceWith = ReplaceWith(
-        expression = "TomlComment",
-        imports = [ "net.peanuuutz.tomlkt.TomlComment" ]
+        expression = "VhmlComment",
+        imports = [ "org.ecorous.vhmlkt.VhmlComment" ]
     )
 )
 @SerialInfo
@@ -62,7 +62,7 @@ public annotation class Comment(vararg val texts: String)
  *
  * ```kotlin
  * data class Data(
- *     @TomlInline
+ *     @VhmlInline
  *     val inlineProperty: Map<String, String>,
  *     val noInlineProperty: Map<String, String>
  * )
@@ -80,22 +80,22 @@ public annotation class Comment(vararg val texts: String)
  * b = "another thing"
  * ```
  *
- * Without @TomlInline, both of the two properties will act like how noInlineProperty behaves.
+ * Without @VhmlInline, both of the two properties will act like how noInlineProperty behaves.
  */
 @SerialInfo
 @Target(AnnotationTarget.PROPERTY)
-public annotation class TomlInline
+public annotation class VhmlInline
 
 /**
  * Modify the encoding of corresponding array-like property, either to force array of tables
  * to be encoded as block array, or to change how many items will be encoded per line
- * (will override [TomlConfig][TomlConfigBuilder.itemsPerLineInBlockArray]).
+ * (will override [VhmlConfig][VhmlConfigBuilder.itemsPerLineInBlockArray]).
  *
- * Note: If the corresponding property is marked [TomlInline], this annotation will not take effect.
+ * Note: If the corresponding property is marked [VhmlInline], this annotation will not take effect.
  *
  * ```kotlin
  * data class NullablePairList<F, S>(
- *     @TomlBlockArray(2)
+ *     @VhmlBlockArray(2)
  *     val list: List<Pair<F, S>?>
  * )
  * NullablePairList(listOf(Pair("key", 1), null, Pair("key", 3), Pair("key", 4)))
@@ -112,23 +112,23 @@ public annotation class TomlInline
  */
 @SerialInfo
 @Target(AnnotationTarget.PROPERTY)
-public annotation class TomlBlockArray(val itemsPerLine: Int = 1)
+public annotation class VhmlBlockArray(val itemsPerLine: Int = 1)
 
 @Deprecated(
     message = "Name change",
     replaceWith = ReplaceWith(
-        expression = "TomlInline",
-        imports = [ "net.peanuuutz.tomlkt.TomlInline" ]
+        expression = "VhmlInline",
+        imports = [ "org.ecorous.vhmlkt.VhmlInline" ]
     )
 )
-public typealias Fold = TomlInline
+public typealias Fold = VhmlInline
 
 /**
  * Mark the corresponding [String] property as multiline when encoded.
  *
  * ```kotlin
  * class MultilineStringData(
- *     @TomlMultilineString
+ *     @VhmlMultilineString
  *     val multilineString: String
  * )
  * MultilineStringData("""
@@ -147,23 +147,23 @@ public typealias Fold = TomlInline
  */
 @SerialInfo
 @Target(AnnotationTarget.PROPERTY)
-public annotation class TomlMultilineString
+public annotation class VhmlMultilineString
 
 @Deprecated(
     message = "Name change",
     replaceWith = ReplaceWith(
-        expression = "TomlMultilineString",
-        imports = [ "net.peanuuutz.tomlkt.TomlMultilineString" ]
+        expression = "VhmlMultilineString",
+        imports = [ "org.ecorous.vhmlkt.VhmlMultilineString" ]
     )
 )
-public typealias Multiline = TomlMultilineString
+public typealias Multiline = VhmlMultilineString
 
 /**
  * Mark the corresponding [String] property as literal when encoded.
  *
  * ```kotlin
  * class LiteralStringData(
- *     @TomlLiteralString
+ *     @VhmlLiteralString
  *     val literalString: String
  * )
  * LiteralStringData("C:\\Users\\<User>\\.m2\\repositories")
@@ -177,23 +177,23 @@ public typealias Multiline = TomlMultilineString
  */
 @SerialInfo
 @Target(AnnotationTarget.PROPERTY)
-public annotation class TomlLiteralString
+public annotation class VhmlLiteralString
 
 @Deprecated(
     message = "Name change",
     replaceWith = ReplaceWith(
-        expression = "TomlLiteralString",
-        imports = [ "net.peanuuutz.tomlkt.TomlLiteralString" ]
+        expression = "VhmlLiteralString",
+        imports = [ "org.ecorous.vhmlkt.VhmlLiteralString" ]
     )
 )
-public typealias Literal = TomlLiteralString
+public typealias Literal = VhmlLiteralString
 
 /**
  * Set the representation of the corresponding [Byte], [Short], [Int], [Long] property.
  *
  * ```kotlin
  * class ByteCode(
- *     @TomlInteger(TomlInteger.Base.BIN)
+ *     @VhmlInteger(VhmlInteger.Base.BIN)
  *     val code: Byte
  * )
  * ByteCode(0b1101)
@@ -207,7 +207,7 @@ public typealias Literal = TomlLiteralString
  */
 @SerialInfo
 @Target(AnnotationTarget.PROPERTY)
-public annotation class TomlInteger(val base: Base) {
+public annotation class VhmlInteger(val base: org.ecorous.vhmlkt.VhmlInteger.Base) {
     /**
      * Representation of a [TOML integer](https://toml.io/en/v1.0.0#integer).
      */

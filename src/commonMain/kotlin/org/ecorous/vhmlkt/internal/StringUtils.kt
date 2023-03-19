@@ -14,7 +14,7 @@
     limitations under the License.
  */
 
-package net.peanuuutz.tomlkt.internal
+package org.ecorous.vhmlkt.internal
 
 import kotlin.math.pow
 

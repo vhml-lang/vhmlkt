@@ -1,4 +1,4 @@
-package net.peanuuutz.tomlkt
+package org.ecorous.vhmlkt
 
 private const val debug: Boolean = true
 

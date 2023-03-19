@@ -14,7 +14,7 @@
     limitations under the License.
  */
 
-package net.peanuuutz.tomlkt.internal
+package org.ecorous.vhmlkt.internal
 
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.builtins.serializer
@@ -27,26 +27,26 @@ import kotlinx.serialization.descriptors.StructureKind.OBJECT
 import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
-import net.peanuuutz.tomlkt.toTomlKey
-import net.peanuuutz.tomlkt.TomlArray
-import net.peanuuutz.tomlkt.TomlBlockArray
-import net.peanuuutz.tomlkt.TomlComment
-import net.peanuuutz.tomlkt.TomlConfig
-import net.peanuuutz.tomlkt.TomlElement
-import net.peanuuutz.tomlkt.TomlEncoder
-import net.peanuuutz.tomlkt.TomlInline
-import net.peanuuutz.tomlkt.TomlInteger
-import net.peanuuutz.tomlkt.TomlLiteral
-import net.peanuuutz.tomlkt.TomlLiteralString
-import net.peanuuutz.tomlkt.TomlMultilineString
-import net.peanuuutz.tomlkt.TomlNull
-import net.peanuuutz.tomlkt.TomlTable
+import org.ecorous.vhmlkt.toVhmlKey
+import org.ecorous.vhmlkt.VhmlArray
+import org.ecorous.vhmlkt.VhmlBlockArray
+import org.ecorous.vhmlkt.VhmlComment
+import org.ecorous.vhmlkt.VhmlConfig
+import org.ecorous.vhmlkt.VhmlElement
+import org.ecorous.vhmlkt.VhmlEncoder
+import org.ecorous.vhmlkt.VhmlInline
+import org.ecorous.vhmlkt.VhmlInteger
+import org.ecorous.vhmlkt.VhmlLiteral
+import org.ecorous.vhmlkt.VhmlLiteralString
+import org.ecorous.vhmlkt.VhmlMultilineString
+import org.ecorous.vhmlkt.VhmlNull
+import org.ecorous.vhmlkt.VhmlTable
 
-internal class TomlFileEncoder(
-    private val config: TomlConfig,
+internal class VhmlFileEncoder(
+    private val config: VhmlConfig,
     override val serializersModule: SerializersModule,
     private val builder: Appendable
-) : Encoder, TomlEncoder {
+) : Encoder, VhmlEncoder {
     override fun encodeBoolean(value: Boolean) { builder.append(value.toString()) }
     override fun encodeByte(value: Byte) { builder.append(value.toString()) }
     override fun encodeShort(value: Short) { builder.append(value.toString()) }
@@ -56,12 +56,12 @@ internal class TomlFileEncoder(
     override fun encodeDouble(value: Double) { builder.append(value.toString()) }
     override fun encodeChar(value: Char) { builder.append(value.escape().doubleQuoted) }
     override fun encodeString(value: String) { builder.append(value.escape().doubleQuoted) }
-    override fun encodeNull() { encodeTomlElement(TomlNull) }
-    override fun encodeTomlElement(value: TomlElement) {
+    override fun encodeNull() { encodeVhmlElement(VhmlNull) }
+    override fun encodeVhmlElement(value: VhmlElement) {
         when (value) {
-            TomlNull, is TomlLiteral -> builder.append(value.toString())
-            is TomlArray -> TomlArraySerializer.serialize(this, value)
-            is TomlTable -> TomlTableSerializer.serialize(this, value)
+            VhmlNull, is VhmlLiteral -> builder.append(value.toString())
+            is VhmlArray -> VhmlArraySerializer.serialize(this, value)
+            is VhmlTable -> VhmlTableSerializer.serialize(this, value)
         }
     }
 
@@ -140,9 +140,9 @@ internal class TomlFileEncoder(
 
     private fun SerialDescriptor.forceInlineAt(index: Int): Boolean {
         val elementDescriptor = getElementDescriptor(index)
-        return getElementAnnotations(index).hasAnnotation<TomlInline>() ||
+        return getElementAnnotations(index).hasAnnotation<org.ecorous.vhmlkt.VhmlInline>() ||
                 elementDescriptor.kind == CONTEXTUAL ||
-                elementDescriptor.isTomlTable ||
+                elementDescriptor.isVhmlTable ||
                 elementDescriptor.isInline
     }
 
@@ -152,48 +152,48 @@ internal class TomlFileEncoder(
 
     private val SerialDescriptor.isArrayOfTables: Boolean get() = kind == LIST && getElementDescriptor(0).isTable
 
-    private val SerialDescriptor.isTomlTable: Boolean get() {
-        return serialName.removeSuffix("?") == TomlTableSerializer.descriptor.serialName
+    private val SerialDescriptor.isVhmlTable: Boolean get() {
+        return serialName.removeSuffix("?") == VhmlTableSerializer.descriptor.serialName
     }
 
     private inline fun <reified T> List<Annotation>.hasAnnotation(): Boolean {
         return filterIsInstance<T>().isNotEmpty()
     }
 
-    private val <T> T.isNull: Boolean get() = this == null || this == TomlNull
+    private val <T> T.isNull: Boolean get() = this == null || this == VhmlNull
 
     private fun Appendable.appendKey(value: String): Appendable = append(value).append(" = ")
 
     // endregion
 
-    internal abstract inner class AbstractEncoder : Encoder, CompositeEncoder, TomlEncoder {
-        final override val serializersModule: SerializersModule = this@TomlFileEncoder.serializersModule
+    internal abstract inner class AbstractEncoder : Encoder, CompositeEncoder, VhmlEncoder {
+        final override val serializersModule: SerializersModule = this@VhmlFileEncoder.serializersModule
 
-        final override fun encodeBoolean(value: Boolean) = this@TomlFileEncoder.encodeBoolean(value)
-        final override fun encodeByte(value: Byte) = this@TomlFileEncoder.encodeByte(value)
-        private fun encodeByteWithBase(value: Byte, base: TomlInteger.Base) {
+        final override fun encodeBoolean(value: Boolean) = this@VhmlFileEncoder.encodeBoolean(value)
+        final override fun encodeByte(value: Byte) = this@VhmlFileEncoder.encodeByte(value)
+        private fun encodeByteWithBase(value: Byte, base: org.ecorous.vhmlkt.VhmlInteger.Base) {
             require(value > 0) { "Negative integer cannot be represented by other bases" }
             builder.append(base.prefix).append(value.toString(base.value))
         }
-        final override fun encodeShort(value: Short) = this@TomlFileEncoder.encodeShort(value)
-        private fun encodeShortWithBase(value: Short, base: TomlInteger.Base) {
+        final override fun encodeShort(value: Short) = this@VhmlFileEncoder.encodeShort(value)
+        private fun encodeShortWithBase(value: Short, base: org.ecorous.vhmlkt.VhmlInteger.Base) {
             require(value > 0) { "Negative integer cannot be represented by other bases" }
             builder.append(base.prefix).append(value.toString(base.value))
         }
-        final override fun encodeInt(value: Int) = this@TomlFileEncoder.encodeInt(value)
-        private fun encodeIntWithBase(value: Int, base: TomlInteger.Base) {
+        final override fun encodeInt(value: Int) = this@VhmlFileEncoder.encodeInt(value)
+        private fun encodeIntWithBase(value: Int, base: org.ecorous.vhmlkt.VhmlInteger.Base) {
             require(value > 0) { "Negative integer cannot be represented by other bases" }
             builder.append(base.prefix).append(value.toString(base.value))
         }
-        final override fun encodeLong(value: Long) = this@TomlFileEncoder.encodeLong(value)
-        private fun encodeLongWithBase(value: Long, base: TomlInteger.Base) {
+        final override fun encodeLong(value: Long) = this@VhmlFileEncoder.encodeLong(value)
+        private fun encodeLongWithBase(value: Long, base: org.ecorous.vhmlkt.VhmlInteger.Base) {
             require(value > 0) { "Negative integer cannot be represented by other bases" }
             builder.append(base.prefix).append(value.toString(base.value))
         }
-        final override fun encodeFloat(value: Float) = this@TomlFileEncoder.encodeFloat(value)
-        final override fun encodeDouble(value: Double) = this@TomlFileEncoder.encodeDouble(value)
-        final override fun encodeChar(value: Char) = this@TomlFileEncoder.encodeChar(value)
-        final override fun encodeString(value: String) = this@TomlFileEncoder.encodeString(value)
+        final override fun encodeFloat(value: Float) = this@VhmlFileEncoder.encodeFloat(value)
+        final override fun encodeDouble(value: Double) = this@VhmlFileEncoder.encodeDouble(value)
+        final override fun encodeChar(value: Char) = this@VhmlFileEncoder.encodeChar(value)
+        final override fun encodeString(value: String) = this@VhmlFileEncoder.encodeString(value)
         private fun encodeMultilineString(value: String) {
             builder.appendLine("\"\"\"").append(value.escape(true)).append("\"\"\"")
         }
@@ -205,18 +205,18 @@ internal class TomlFileEncoder(
             require("'''" !in value) { "Cannot have \"\\'\\'\\'\" in multiline literal string" }
             builder.appendLine("'''").append(value).append("'''")
         }
-        final override fun encodeNull() = this@TomlFileEncoder.encodeNull()
-        final override fun encodeTomlElement(value: TomlElement) {
+        final override fun encodeNull() = this@VhmlFileEncoder.encodeNull()
+        final override fun encodeVhmlElement(value: VhmlElement) {
             when (value) {
-                TomlNull, is TomlLiteral -> builder.append(value.toString())
-                is TomlArray -> TomlArraySerializer.serialize(this, value)
-                is TomlTable -> TomlTableSerializer.serialize(this, value)
+                VhmlNull, is VhmlLiteral -> builder.append(value.toString())
+                is VhmlArray -> VhmlArraySerializer.serialize(this, value)
+                is VhmlTable -> VhmlTableSerializer.serialize(this, value)
             }
         }
 
         final override fun encodeInline(inlineDescriptor: SerialDescriptor): Encoder = this
         final override fun encodeEnum(enumDescriptor: SerialDescriptor, index: Int) {
-            this@TomlFileEncoder.encodeEnum(enumDescriptor, index)
+            this@VhmlFileEncoder.encodeEnum(enumDescriptor, index)
         }
 
         override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
@@ -231,26 +231,26 @@ internal class TomlFileEncoder(
             encodeSerializableElement(descriptor, index, Boolean.serializer(), value)
         }
         final override fun encodeByteElement(descriptor: SerialDescriptor, index: Int, value: Byte) {
-            encodeTomlIntegerElement(descriptor, index, value, ::encodeByte, ::encodeByteWithBase)
+            encodeVhmlIntegerElement(descriptor, index, value, ::encodeByte, ::encodeByteWithBase)
         }
         final override fun encodeShortElement(descriptor: SerialDescriptor, index: Int, value: Short) {
-            encodeTomlIntegerElement(descriptor, index, value, ::encodeShort, ::encodeShortWithBase)
+            encodeVhmlIntegerElement(descriptor, index, value, ::encodeShort, ::encodeShortWithBase)
         }
         final override fun encodeIntElement(descriptor: SerialDescriptor, index: Int, value: Int) {
-            encodeTomlIntegerElement(descriptor, index, value, ::encodeInt, ::encodeIntWithBase)
+            encodeVhmlIntegerElement(descriptor, index, value, ::encodeInt, ::encodeIntWithBase)
         }
         final override fun encodeLongElement(descriptor: SerialDescriptor, index: Int, value: Long) {
-            encodeTomlIntegerElement(descriptor, index, value, ::encodeLong, ::encodeLongWithBase)
+            encodeVhmlIntegerElement(descriptor, index, value, ::encodeLong, ::encodeLongWithBase)
         }
-        private inline fun <T> encodeTomlIntegerElement(
+        private inline fun <T> encodeVhmlIntegerElement(
             descriptor: SerialDescriptor,
             index: Int,
             value: T,
             encodeNormally: (T) -> Unit,
-            encodeWithBase: (T, TomlInteger.Base) -> Unit
+            encodeWithBase: (T, org.ecorous.vhmlkt.VhmlInteger.Base) -> Unit
         ) {
             head(descriptor, index)
-            val annotations = descriptor.getElementAnnotations(index).filterIsInstance<TomlInteger>()
+            val annotations = descriptor.getElementAnnotations(index).filterIsInstance<org.ecorous.vhmlkt.VhmlInteger>()
             if (annotations.isEmpty()) {
                 encodeNormally(value)
             } else {
@@ -270,8 +270,8 @@ internal class TomlFileEncoder(
         final override fun encodeStringElement(descriptor: SerialDescriptor, index: Int, value: String) {
             head(descriptor, index)
             val annotations = descriptor.getElementAnnotations(index)
-            val isLiteral = annotations.hasAnnotation<TomlLiteralString>()
-            val isMultiline = annotations.hasAnnotation<TomlMultilineString>()
+            val isLiteral = annotations.hasAnnotation<org.ecorous.vhmlkt.VhmlLiteralString>()
+            val isMultiline = annotations.hasAnnotation<org.ecorous.vhmlkt.VhmlMultilineString>()
             if (isLiteral) {
                 if (isMultiline) {
                     encodeMultilineLiteralString(value)
@@ -299,7 +299,7 @@ internal class TomlFileEncoder(
             value: T?
         ) {
             when (value) { // Revisit type-specific encoding
-                null -> encodeSerializableElement(descriptor, index, TomlNullSerializer, TomlNull)
+                null -> encodeSerializableElement(descriptor, index, VhmlNullSerializer, VhmlNull)
                 is Byte -> encodeByteElement(descriptor, index, value)
                 is Short -> encodeShortElement(descriptor, index, value)
                 is Int -> encodeIntElement(descriptor, index, value)
@@ -403,7 +403,7 @@ internal class TomlFileEncoder(
             value: T
         ) {
             if (isKey) {
-                builder.appendKey(value.toTomlKey().escape().doubleQuotedIfNeeded())
+                builder.appendKey(value.toVhmlKey().escape().doubleQuotedIfNeeded())
             } else {
                 serializer.serialize(this, value)
             }
@@ -494,7 +494,7 @@ internal class TomlFileEncoder(
             else -> throw UnsupportedSerialKindException(descriptor.kind)
         }
 
-        protected open val blockArrayModification: TomlBlockArray? get() = null
+        protected open val blockArrayModification: org.ecorous.vhmlkt.VhmlBlockArray? get() = null
 
         protected fun concatPath(childPath: String): String {
             return if (path.isNotEmpty()) "$path.$childPath" else childPath
@@ -508,7 +508,7 @@ internal class TomlFileEncoder(
         structured: Boolean,
         path: String
     ) : TableLikeEncoder(structured, path) {
-        override var blockArrayModification: TomlBlockArray? = null
+        override var blockArrayModification: org.ecorous.vhmlkt.VhmlBlockArray? = null
 
         override fun head(descriptor: SerialDescriptor, index: Int) {
             comment(descriptor, index)
@@ -524,7 +524,7 @@ internal class TomlFileEncoder(
                 if (elementDescriptor.isTable) {
                     builder.appendLine().appendLine("[$currentChildPath]")
                 } else if (elementDescriptor.isArrayOfTables) {
-                    val annotations = descriptor.getElementAnnotations(index).filterIsInstance<TomlBlockArray>()
+                    val annotations = descriptor.getElementAnnotations(index).filterIsInstance<org.ecorous.vhmlkt.VhmlBlockArray>()
                     if (annotations.isNotEmpty()) {
                         builder.appendKey(key)
                         blockArrayModification = annotations[0]
@@ -544,8 +544,8 @@ internal class TomlFileEncoder(
             var inline = false
             for (annotation in annotations) {
                 when (annotation) {
-                    is TomlInline -> inline = true
-                    is TomlComment -> annotation.text.trimIndent().split('\n').forEach(lines::add)
+                    is org.ecorous.vhmlkt.VhmlInline -> inline = true
+                    is org.ecorous.vhmlkt.VhmlComment -> annotation.text.trimIndent().split('\n').forEach(lines::add)
                 }
             }
             if (lines.size > 0) {
@@ -607,7 +607,7 @@ internal class TomlFileEncoder(
         private lateinit var key: String
 
         init {
-            inlineChild = valueDescriptor.kind == CONTEXTUAL || valueDescriptor.isTomlTable
+            inlineChild = valueDescriptor.kind == CONTEXTUAL || valueDescriptor.isVhmlTable
             structuredChild = structured
         }
 
@@ -633,7 +633,7 @@ internal class TomlFileEncoder(
         override fun head(descriptor: SerialDescriptor, index: Int) {}
 
         private fun <T> storeKey(value: T) {
-            key = value.toTomlKey().escape().doubleQuotedIfNeeded()
+            key = value.toVhmlKey().escape().doubleQuotedIfNeeded()
             currentChildPath = concatPath(key)
         }
 

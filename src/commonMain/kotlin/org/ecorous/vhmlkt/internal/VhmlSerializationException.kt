@@ -14,40 +14,40 @@
     limitations under the License.
  */
 
-package net.peanuuutz.tomlkt.internal
+package org.ecorous.vhmlkt.internal
 
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialKind
-import net.peanuuutz.tomlkt.internal.parser.Path
+import org.ecorous.vhmlkt.internal.parser.Path
 
-internal sealed class TomlEncodingException : SerializationException {
+internal sealed class VhmlEncodingException : SerializationException {
     constructor()
     constructor(message: String) : super(message)
 }
 
-internal class NonPrimitiveKeyException : TomlEncodingException()
+internal class NonPrimitiveKeyException : VhmlEncodingException()
 
-internal class UnsupportedSerialKindException(kind: SerialKind) : TomlEncodingException("$kind")
+internal class UnsupportedSerialKindException(kind: SerialKind) : VhmlEncodingException("$kind")
 
-internal class NullInArrayOfTableException : TomlEncodingException(
+internal class NullInArrayOfTableException : VhmlEncodingException(
     message = "Null is not allowed in array of table, " +
-            "please mark the corresponding property as @TomlBlockArray or @TomlInline"
+            "please mark the corresponding property as @VhmlBlockArray or @VhmlInline"
 )
 
-internal class EmptyArrayOfTableInMapException : TomlEncodingException(
+internal class EmptyArrayOfTableInMapException : VhmlEncodingException(
     message = "Empty array of table can only be the first in map"
 )
 
-internal sealed class TomlDecodingException(message: String) : SerializationException(message)
+internal sealed class VhmlDecodingException(message: String) : SerializationException(message)
 
-internal class UnexpectedTokenException(token: Char, line: Int) : TomlDecodingException(
+internal class UnexpectedTokenException(token: Char, line: Int) : VhmlDecodingException(
     message = "'${if (token != '\'') token.escape() else "\\'"}' (L$line)"
 )
 
-internal class IncompleteException(line: Int) : TomlDecodingException("(L$line)")
+internal class IncompleteException(line: Int) : VhmlDecodingException("(L$line)")
 
-internal class ConflictEntryException(path: Path) : TomlDecodingException(
+internal class ConflictEntryException(path: Path) : VhmlDecodingException(
     message = path.joinToString(".") { it.escape().doubleQuotedIfNeeded() }
 )
 
-internal class UnknownKeyException(key: String) : TomlDecodingException(key)
+internal class UnknownKeyException(key: String) : VhmlDecodingException(key)
